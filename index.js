@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000
 
 // midleware
@@ -69,9 +69,22 @@ async function run() {
       const result = await usersCollection.find().toArray()
       res.send(result)
     })
+    // guide info insert in guideinfo db
     app.post('/guideInfo', async(req, res) =>{
       const guideInfo = req.body;
       const result = await guideInfoCollection.insertOne(guideInfo)
+      res.send(result)
+    })
+    // get guideinfo data from db
+    app.get('/guideInfo', async(req,res) =>{
+      const result = await guideInfoCollection.find().toArray()
+      res.send(result)
+    })
+    // get single guideinfor for show guide details page
+    app.get('/guide-details/:id', async(req, res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await guideInfoCollection.findOne(query)
       res.send(result)
     })
 
