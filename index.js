@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const cors = require('cors')
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000
 
@@ -25,10 +26,44 @@ async function run() {
   try {
     const usersCollection = client.db('tourista').collection('users')
     const guideInfoCollection = client.db('tourista').collection('guideInfo')
-
+    // jwt relted api
+  app.post('/jwt', async(req, res)=>{
+    const user = req.body;
+    const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn:'7d'
+    })
+    res.send({token})
+  })
+  // midleware
+  const verifyToken = (req, res, next) =>{
+    console.log('inside verify token', req.headers.authorization)
+    if(!req.headers.authorization){
+      return res.status(401).send({message:'unauthorize access'})
+    }
+    const token = req.headers.authorization.split(' ')[1]
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
+    if(err){
+      return res.status(401).send({message:'unauthorize access'})
+    }
+    req.decoded = decoded;
+    next()
+    } )
+   
+  }
+  //  verify admin midleware
+  const verifyAdmin = async (req, res, next) =>{
+    const email = req.decoded.email;
+    const query = {email: email}
+    const user = await usersCollection.findOne(query)
+    const isAdmin = user?.role === 'Admin'
+    if(!isAdmin){
+      return res.status(403).send({message: 'unauthorize access'})
+    }
+  next()
+  }
 
        // save a user in db
-       app.put('/user', async(req,res)=>{
+       app.put('/user',verifyToken, async(req,res)=>{
         const user = req.body
         const query = {email: user?.email}
         // if user already exists in db 
