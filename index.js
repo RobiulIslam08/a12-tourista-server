@@ -26,8 +26,11 @@ async function run() {
   try {
     const usersCollection = client.db('tourista').collection('users')
     const guideInfoCollection = client.db('tourista').collection('guideInfo')
+    const packagesCollection = client.db('tourista').collection('packages')
+
+
     // jwt relted api
-  app.post('/jwt', async(req, res)=>{
+  app.post('/jwt', async(req, res)=>{ 
     const user = req.body;
     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn:'7d'
@@ -63,7 +66,7 @@ async function run() {
   }
 
        // save a user in db
-       app.put('/user',verifyToken, async(req,res)=>{
+       app.put('/user', async(req,res)=>{
         const user = req.body
         const query = {email: user?.email}
         // if user already exists in db 
@@ -124,7 +127,12 @@ async function run() {
     })
 
 
-
+     //packeage collection a data insert from add package page
+  app.post('/add-package',verifyToken,verifyAdmin, async(req, res)=>{
+    const packageItem = req.body;
+    const result = await packagesCollection.insertOne(packageItem)
+    res.send(result)
+  })
 
 
 
