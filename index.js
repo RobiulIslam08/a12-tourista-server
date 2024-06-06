@@ -27,6 +27,7 @@ async function run() {
     const usersCollection = client.db('tourista').collection('users')
     const guideInfoCollection = client.db('tourista').collection('guideInfo')
     const packagesCollection = client.db('tourista').collection('packages')
+    const bookingCollection = client.db('tourista').collection('booking')
 
 
     // jwt relted api
@@ -66,34 +67,62 @@ async function run() {
   }
 
        // save a user in db
-       app.put('/user', async(req,res)=>{
-        const user = req.body
-        const query = {email: user?.email}
-        // if user already exists in db 
-        const isExists = await usersCollection.findOne(query)
-        if(isExists){
-          if(user.status === 'Requested'){
-            const result = await usersCollection.updateOne(query,{
-              $set:{status:user?.status},
-            })
-            res.send(result)
-          }
-          else{
-            return res.send(isExists)
-          }
-        }
+      //  app.put('/user', async(req,res)=>{
+      //   const user = req.body
+      //   const query = {email: user?.email}
+      //   // if user already exists in db 
+      //   const isExists = await usersCollection.findOne(query)
+      //   if(isExists){
+      //     if(user.status === 'Requested'){
+      //       const result = await usersCollection.updateOne(query,{
+      //         $set:{status:user?.status},
+      //       })
+      //       res.send(result)
+      //     }
+      //     else{
+      //       return res.send(isExists)
+      //     }
+      //   }
       
-          // save user for the first time
-        const options = {upsert: true}
-        const updateDoc = {
-          $set:{
-            ...user,
-            Timestamp: Date.now()
-          }
-        }
-        const result = await usersCollection.updateOne(query, updateDoc, options)
-        res.send(result)
-      })
+      //     // save user for the first time
+      //   const options = {upsert: true}
+      //   const updateDoc = {
+      //     $set:{
+      //       ...user,
+      //       Timestamp: Date.now()
+      //     }
+      //   }
+      //   const result = await usersCollection.updateOne(query, updateDoc, options)
+      //   res.send(result)
+      // })
+      // Save or update a user in the database
+app.put('/user', async (req, res) => {
+  const user = req.body;
+  const query = { email: user?.email };
+  
+  const isExists = await usersCollection.findOne(query);
+  if (isExists) {
+      if (user.status === 'Requested') {
+          const result = await usersCollection.updateOne(query, {
+              $set: { status: user?.status },
+          });
+          return res.send(result);
+      } else {
+          return res.send(isExists);
+      }
+  }
+
+  const options = { upsert: true };
+  const updateDoc = {
+      $set: {
+          ...user,
+          Timestamp: Date.now(),
+      },
+  };
+  const result = await usersCollection.updateOne(query, updateDoc, options);
+  res.send(result);
+});
+
          // get user info by email in  db
     app.get('/user/:email', async(req, res)=>{
       const email = req.params.email
@@ -133,7 +162,49 @@ async function run() {
     const result = await packagesCollection.insertOne(packageItem)
     res.send(result)
   })
+  // get package item db and show our package tab a
+  app.get('/add-package', async(req, res) =>{
+    const result = await packagesCollection.find().toArray();
+    res.send(result)
+  })
+  // get single package for show view package / package details page
+  app.get('/package-detaisl/:id', async(req, res) =>{
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const result = await packagesCollection.findOne(query)
+    res.send(result)
+  })
 
+
+   // save a user in db
+  //  app.put('/user', async(req,res)=>{
+  //   const user = req.body
+  //   const query = {email: user?.email}
+  //   // if user already exists in db 
+  //   const isExists = await usersCollection.findOne(query)
+  //   if(isExists){
+  //     if(user.status === 'Requested'){
+  //       const result = await usersCollection.updateOne(query,{
+  //         $set:{status:user?.status},
+  //       })
+  //       res.send(result)
+  //     }
+  //     else{
+  //       return res.send(isExists)
+  //     }
+  //   }
+  
+  //     // save user for the first time
+  //   const options = {upsert: true}
+  //   const updateDoc = {
+  //     $set:{
+  //       ...user,
+  //       Timestamp: Date.now()
+  //     }
+  //   }
+  //   const result = await usersCollection.updateOne(query, updateDoc, options)
+  //   res.send(result)
+  // })
 
 
 
