@@ -95,10 +95,11 @@ async function run() {
       //   const result = await usersCollection.updateOne(query, updateDoc, options)
       //   res.send(result)
       // })
+
+
       // Save or update a user in the database
 app.put('/user', async (req, res) => {
   const user = req.body;
-  console.log('checked user',user)
   const query = { email: user?.email };
   
   const isExists = await usersCollection.findOne(query);
@@ -193,6 +194,19 @@ app.put('/user', async (req, res) => {
   })
 
 
+  // save booking data in db from packageDetails page and change status review, rejected and accepted
+  app.post('/add-booking', async (req, res) => {
+    const bookingPackage = req.body;
+    const result = await bookingCollection.insertOne(bookingPackage);
+    res.send(result);
+  });
+  app.get('/add-booking/:email', async(req, res) =>{
+    const email = req.params.email;
+    const query = {touristEmail : email}
+    const result = await bookingCollection.find(query).toArray();
+    res.send(result)
+  })
+   
 
 
 
