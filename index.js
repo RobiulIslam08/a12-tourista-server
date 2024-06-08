@@ -200,10 +200,19 @@ app.put('/user', async (req, res) => {
     const result = await bookingCollection.insertOne(bookingPackage);
     res.send(result);
   });
+  //  get booking data by email and show this my booking page
   app.get('/add-booking/:email', async(req, res) =>{
     const email = req.params.email;
     const query = {touristEmail : email}
     const result = await bookingCollection.find(query).toArray();
+    res.send(result)
+  })
+
+  // delete booking item db from action 'my booking page'
+  app.delete('/booking-delete/:id' , async(req, res) => {
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const result = await bookingCollection.deleteOne(query)
     res.send(result)
   })
    
