@@ -216,6 +216,30 @@ app.put('/user', async (req, res) => {
     res.send(result)
   })
    
+  // get data for assinged-tour page (tour guide)
+  app.get('/assigned-tour/:name', async(req, res) => {
+    const name = req.params.name
+    const query = {selectedGuide: name}
+    const result = await bookingCollection.find(query).toArray()
+    res.send(result)
+  })
+  
+
+  // update status when click tour guide from "assinged tour page"
+  app.patch('/update-status/:id', async(req, res) =>{
+    const id = req.params.id;
+    const filter = {_id: new ObjectId(id)}
+    const updataInfo = req.body;
+    const updateDoc = {
+      $set : {
+        ...updataInfo,
+      }
+    }
+    const result = await bookingCollection.updateOne(filter, updateDoc)
+    res.send(result)
+  })
+
+
 
 
 
