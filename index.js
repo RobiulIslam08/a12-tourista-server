@@ -28,6 +28,7 @@ async function run() {
     const guideInfoCollection = client.db('tourista').collection('guideInfo')
     const packagesCollection = client.db('tourista').collection('packages')
     const bookingCollection = client.db('tourista').collection('booking')
+    const wishlistCollection = client.db('tourista').collection('wishlist')
 
 
     // jwt relted api
@@ -239,9 +240,28 @@ app.put('/user', async (req, res) => {
     res.send(result)
   })
 
+  // wishlist collection a data add from ourpackage tap when click heart icon
+  app.post('/wishlist', async(req, res)=>{
+    const packageInfo = req.body;
+    const result = await wishlistCollection.insertOne(packageInfo);
+    res.send(result)
+  })
 
+  // get data for show in  wishlist page
+  app.get('/wishlist/:email', async(req, res)=> {
+    const email = req.params.email;
+    const query = {userEmail:email}
+    const result = await wishlistCollection.find(query).toArray();
+    res.send(result)
+  })
 
-
+  // delete api for my wishlist page 
+  app.delete('/mywishlist-delete/:id' , async(req, res) => {
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const result = await wishlistCollection.deleteOne(query)
+    res.send(result)
+  })
 
 
 
