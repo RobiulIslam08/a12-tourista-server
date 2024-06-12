@@ -280,6 +280,13 @@ app.put('/user', async (req, res) => {
     const result = await storiesCollection.find().toArray()
     res.send(result)
   })
+  // story details data get db by id
+  app.get('/story-details/:id', async(req, res)=>{
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const result = await storiesCollection.findOne(query)
+    res.send(result)
+  })
 
   // payment intent
   app.post("/create-payment-intent", async (req, res) =>{
