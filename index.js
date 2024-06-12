@@ -8,7 +8,11 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000
 
 // midleware
-app.use(cors())
+
+app.use(cors({
+  origin:  ['https://tourista-server-jade.vercel.app','http://localhost:5173', 'http://localhost:5174'], 
+  credentials: true
+}));
 app.use(express.json())
 
 
@@ -30,6 +34,7 @@ async function run() {
     const packagesCollection = client.db('tourista').collection('packages')
     const bookingCollection = client.db('tourista').collection('booking')
     const wishlistCollection = client.db('tourista').collection('wishlist')
+    const storiesCollection = client.db('tourista').collection('stories')
 
 
     // jwt relted api
@@ -261,6 +266,12 @@ app.put('/user', async (req, res) => {
     const id = req.params.id;
     const query = {_id: new ObjectId(id)}
     const result = await wishlistCollection.deleteOne(query)
+    res.send(result)
+  })
+  // story inser from tourist profile to db
+  app.post('/story', async(req, res) =>{
+    const storyInfo = req.body;
+    const result = await storiesCollection.insertOne(storyInfo);
     res.send(result)
   })
 
