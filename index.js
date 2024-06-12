@@ -14,6 +14,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json())
+ 
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rqcbidk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -272,6 +273,11 @@ app.put('/user', async (req, res) => {
   app.post('/story', async(req, res) =>{
     const storyInfo = req.body;
     const result = await storiesCollection.insertOne(storyInfo);
+    res.send(result)
+  })
+  // get story data in story section in home page
+  app.get('/story', async(req, res) =>{
+    const result = await storiesCollection.find().toArray()
     res.send(result)
   })
 
